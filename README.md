@@ -1,4 +1,4 @@
-# Freeserve
+# breaker
 
 Small python library to help with serving requests between services.
 
