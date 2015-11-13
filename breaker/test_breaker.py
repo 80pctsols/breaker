@@ -6,16 +6,37 @@ from .breaker import (
 import datetime
 import time
 
-def func(a, b, c=10):
-    return a + b + c
+# Functions used in tests
+def func(x1, x2, x3=10):
+    return x1 + x2 + x3
 
 def error_func():
-    l = []
-    return l[10]
+    bad_list = []
+    return bad_list[10]
 
 def error2_func():
     raise Exception
 
+# Class used to test cb use with class
+class MyClassTester(object):
+
+    def __init__(self):
+        self.cbs = {}
+
+    def _func(self):
+        return 10 * 10
+
+    def func(self):
+        return self.get_cb(self._func).call()
+
+    def get_cb(self, function):
+        func_name = function.__name__
+        if func_name in self.cbs:
+            return self.cbs[func_name]
+        self.cbs[func_name] = CircuitBreaker(function)
+        return self.cbs[func_name]
+
+# Test functions
 def test_call():
     cb = CircuitBreaker(func)
     assert cb.call(1, 2) == func(1, 2)
@@ -86,6 +107,18 @@ def test_half_open_close():
 
     assert cb.state() == cb.OPEN
     assert cb.is_half_open() is False
+
+def test_class_use():
+    myclass = MyClassTester()
+    assert myclass.func() == 100
+
+    myclass.cbs['_func'].num_failures = 20
+
+    try:
+        myclass.func()
+        assert False
+    except CircuitBreakerException:
+        assert True
 
 def past(seconds):
     return datetime.datetime.now() - datetime.timedelta(seconds=seconds)
