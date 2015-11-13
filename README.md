@@ -9,7 +9,7 @@ that are returning errors.
 
 ## Usage
 
-```
+```python
 from breaker import CircuitBreaker
 
 def my_function(a, b):
