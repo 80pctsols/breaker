@@ -1,2 +1,6 @@
 *.pyc
 __pycache__/
+.cache/
+.coverage
+breaker.egg-info/
+build/

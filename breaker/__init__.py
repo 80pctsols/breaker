@@ -6,3 +6,4 @@ limiting requests to failing servies.
 
 """
 
+from .breaker import CircuitBreaker, CircuitBreakerException
